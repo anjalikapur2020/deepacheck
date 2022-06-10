@@ -6,9 +6,9 @@ const Body= Matter.Body
 var points=0
 
 var engine,world,ball1,wallright,wallleft
-
+var balls=[]
 var gamestate= "wait"
-var bgplay,b1,aboutpop,aboutImg
+var bgplay,b1,aboutpop,aboutImg,ballshadow
 
 
 function preload(){
@@ -20,10 +20,10 @@ bgplay2=loadImage("bgnew.gif")
 //bgplay2=loadImage("bgplay1.gif")
 aboutImg=loadImage("popabout.png")
 hoopimg=loadImage("basketballhoop.png")
-ballimg1=loadImage("ball.gif")
+ballimg1=loadImage("ballspin.gif")
 ballimg=loadImage("ball.png")
 scoreimg1=loadImage("scoreimg.png")
-scoreimg=loadImage("scoreimg2.png")
+scoreimg2=loadImage("scoreimg2.png")
 scoreimg=loadImage("scoreimg3.png")
 livesimg=loadImage("lives.png")
 playerimg=loadImage("boywalk.gif")
@@ -35,7 +35,7 @@ playerleftimg=loadImage("boywalkleft.gif")
 
 
 function setup(){
-createCanvas(windowWidth-20,windowHeight-20)
+createCanvas(windowWidth-50,windowHeight-50)
 
 engine=Engine.create()
 world=engine.world
@@ -88,7 +88,7 @@ aboutpop.visible=false
 aboutpop.addImage(aboutImg)
 aboutpop.scale=5
 
-score=createSprite(60,70)
+score=createSprite(width/2,70)
 score.addImage(scoreimg)
 score.visible=false
 score.scale=.4
@@ -105,14 +105,14 @@ player.visible=false
 player.scale=.4
 // player.debug=true
 
+ballshadow=createSprite(ball.position.x,ball.position.x)
+ballshadow.addImage(ballimg1)
+ballshadow.visible=false
+ballshadow.scale=.15
 
 //create groups
 hoopsgroup = new Group()
 obstaclesgroup = new Group()
-
-
-
-
 
 
 
@@ -156,8 +156,12 @@ if(gamestate==="play"){
     spawnHoops()
     //ground.show()
     score.visible=true
-    lives.visible=true
+   // lives.visible=true
     player.visible=true
+player.x=ball.position.x-70
+ballshadow.x=ball.position.x
+ballshadow.y=ball.position.y
+ballshadow.visible=true
 
 
    //if(ball!=null){
@@ -167,9 +171,11 @@ if(gamestate==="play"){
         
      // player.y=height-(ball.position.y+10)
     for(i=0;i<hoopsgroup.length;i++){
-    if(collide(ball,hoopsgroup.get(i))==true)
+    if(ballshadow.isTouching(hoopsgroup.get(i)))
     {
-      points +=1
+        hoopsgroup.get(i).destroy()
+        points +=1
+     
     }}
   
    
@@ -246,6 +252,8 @@ cancel.mousePressed(()=>{
      score.visible=false
      lives.visible=false
      player.visible=false
+     ballshadow.visible=false
+
 
  }
  
@@ -273,7 +281,7 @@ textAlign("left")
        }
        
     if(gamestate==="play")
-    { fill("green")
+    { fill("black")
         textSize(25)
         stroke("blue")
         strokeWeight(2)
@@ -341,11 +349,12 @@ function collide(body,sprite)
 {
   if(body!=null)
         {
-         var d = dist(body.position.x,body.position.y,sprite.position.x,sprite.position.y);
-          if(d<=80)
+         var d = dist(body.position.x,body.position.y,sprite.body.x,sprite.body.y);
+          if(d<=100)
             {
               World.remove(engine.world,ball);
                ball = null;
+               points +=1
                return true; 
             }
             else{
