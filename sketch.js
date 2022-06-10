@@ -14,12 +14,22 @@ var bgplay,b1,aboutpop,aboutImg
 function preload(){
 bg=loadImage("splashscreen.png")
 bgplay=loadImage("bg.gif")
-bgplay2=loadImage("bgplay1.gif")
+//bgplay2=loadImage("bg.jpg")
+bgplay2=loadImage("bgnew.gif")
+
+//bgplay2=loadImage("bgplay1.gif")
 aboutImg=loadImage("popabout.png")
 hoopimg=loadImage("basketballhoop.png")
 ballimg1=loadImage("ball.gif")
 ballimg=loadImage("ball.png")
-scoreimg=loadImage("scoreimg.png")
+scoreimg1=loadImage("scoreimg.png")
+scoreimg=loadImage("scoreimg2.png")
+scoreimg=loadImage("scoreimg3.png")
+livesimg=loadImage("lives.png")
+playerimg=loadImage("boywalk.gif")
+playerleftimg=loadImage("boywalkleft.gif")
+
+
 
 }
 
@@ -30,9 +40,14 @@ createCanvas(windowWidth-20,windowHeight-20)
 engine=Engine.create()
 world=engine.world
 
+//create buttons
 play=createImg("play.gif")
 play.position(width/2+width/3.5,18)
 play.size(200,200)
+
+how=createImg("how.gif")
+how.position(width/2+width/3.35,height-200)
+how.size(275,275)
 
 about=createImg("about.gif")
 about.position(play.x+150,0)
@@ -49,25 +64,12 @@ cancel.position(width-200,height-200)
 cancel.size(250,250)
 cancel.hide()
 
-aboutpop=createSprite(width/2,height/2+20,200,200)
-aboutpop.visible=false
-aboutpop.addImage(aboutImg)
-aboutpop.scale=5
 
-
-hoopsgroup = new Group()
-obstaclesgroup = new Group()
-
+//create ground objects from ground class using matter.js
 ground =new Ground(width/2,height-50,width,20);
 wallleft =new Ground(20,height/2,20,height);
 wallright =new Ground(width-20,height/2,20,height);
 walltop =new Ground(width/2,10,width,20);
-
-
-score=createSprite(100,50)
-score.addImage(scoreimg)
-score.visible=false
-score.scale=.4
 
 
 var ball_options = {
@@ -80,12 +82,47 @@ var ball_options = {
   World.add(world,ball);
 
 
+//sprites for pop up player etc
+aboutpop=createSprite(width/2,height/2+20,200,200)
+aboutpop.visible=false
+aboutpop.addImage(aboutImg)
+aboutpop.scale=5
+
+score=createSprite(60,70)
+score.addImage(scoreimg)
+score.visible=false
+score.scale=.4
+
+
+lives=createSprite(width-100,70)
+lives.addImage(livesimg)
+lives.visible=false
+lives.scale=.4
+
+player=createSprite(ball.position.x-40,height-(ball.position.y+10))
+player.addImage(playerimg)
+player.visible=false
+player.scale=.4
+// player.debug=true
+
+
+//create groups
+hoopsgroup = new Group()
+obstaclesgroup = new Group()
+
+
+
+
+
+
+
 
 }
 
 
 function draw()
 {
+    Engine.update(engine)
     background(bg)
     Engine.update(engine)
 
@@ -94,6 +131,7 @@ if(gamestate==="wait"){
     about.show()
     back.hide()
     cancel.hide()
+    how.show()
 
 
 }
@@ -104,22 +142,30 @@ play.mousePressed(()=>{
 })
 
 if(gamestate==="play"){
+
     background(bgplay2)
     play.hide()
     about.hide()
     back.show()
     cancel.hide()
+    how.hide()
+
     imageMode(CENTER)
 
-image(ballimg,this.ball.position.x,this.ball.position.y,80,80)
+
     spawnHoops()
     //ground.show()
     score.visible=true
+    lives.visible=true
+    player.visible=true
 
-    if(ball!=null){
+
+   //if(ball!=null){
         image(ballimg,ball.position.x,ball.position.y,70,70);
-      }
+     // }
     
+        
+     // player.y=height-(ball.position.y+10)
     for(i=0;i<hoopsgroup.length;i++){
     if(collide(ball,hoopsgroup.get(i))==true)
     {
@@ -129,7 +175,7 @@ image(ballimg,this.ball.position.x,this.ball.position.y,80,80)
    
 
   
-if(ball.position.x>=width || ball.position.x<0){
+/*if(ball.position.x>=width || ball.position.x<0){
     var ball_options = {
         restitution: 0.5,
         airFriction:1.5,
@@ -141,7 +187,7 @@ if(ball.position.x>=width || ball.position.x<0){
     
     
     
-    }
+    }*/
     
 
 
@@ -164,6 +210,23 @@ about.mousePressed(()=>{
      play.hide()
      about.hide()
      cancel.show()
+     how.hide()
+
+ }
+
+ how.mousePressed(()=>{
+    gamestate="how"
+    aboutpop.visible=true
+    cancel.show()
+
+ })
+ 
+ if(gamestate==="how"){
+     play.hide()
+     about.hide()
+     cancel.show()
+how.hide()
+
 
  }
 
@@ -181,6 +244,8 @@ cancel.mousePressed(()=>{
  if (gamestate !== "play"){
      hoopsgroup.destroyEach()
      score.visible=false
+     lives.visible=false
+     player.visible=false
 
  }
  
@@ -197,13 +262,27 @@ textAlign("left")
  
     }
 
+    if (gamestate==="how"){
+        fill("red")
+        stroke("black")
+        strokeWeight(2)
+       textSize(35)
+   textAlign("left")
+        text("Instructions to PLAY:-\n\n\nUse Arrow Keys to throw the ball...\n\nUP ARROW - Moves the ball up.\nLEFT ARROW - Moves the ball left.\nRIGHT ARROW - Moves the ball up.\nDOWN ARROW - Moves the ball down.",aboutpop.x-(aboutpop.width+80),aboutpop.y-(aboutpop.height+50))
+    
+       }
+       
     if(gamestate==="play")
     { fill("green")
         textSize(25)
         stroke("blue")
         strokeWeight(2)
-        text(points,(score.x+20),score.y+2)
+        text(points,(score.x+40),score.y-15)
     }
+
+
+
+  
 
 }
 
@@ -230,12 +309,24 @@ function keyPressed() {
     if (keyCode === RIGHT_ARROW) {
 
    Matter.Body.applyForce(ball,{x:0,y:0},{x:.01,y:-.01})
+   player.addImage(playerimg)
+   player.scale=.4
+
 }
 
 
   else if (keyCode === LEFT_ARROW) {
 
     Matter.Body.applyForce(ball,{x:0,y:0},{x:-.01,y:-.01})
+    player.addImage(playerleftimg)
+    player.scale=.6
+}
+
+else if (keyCode === UP_ARROW) {
+
+    Matter.Body.applyForce(ball,{x:0,y:0},{x:-0,y:-.01})
+    //player.addImage(playerleftimg)
+    //player.scale=.6
 }
 
 

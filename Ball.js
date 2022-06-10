@@ -1,6 +1,7 @@
 class Ball{
     constructor(){
 
+        
 
 var options={
     isStatic:false,
