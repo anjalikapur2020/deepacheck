@@ -28,11 +28,14 @@ function preload() {
     livesimg = loadImage("lives.png")
     playerimg = loadImage("boywalk.gif")
     playerleftimg = loadImage("boywalkleft.gif")
+   // stopimg = loadImage("stopgame.png")
+endbg=loadImage("hoop1.gif")
 
     got1 = loadImage("gotit1.gif")
     got2 = loadImage("gotit2.gif")
     got3 = loadImage("gotit3.gif")
 
+    gameoverimg=loadImage("gameover.gif")
 
     //sounds
     gameplaysound=loadSound("bouncingsound.mp3")
@@ -70,6 +73,17 @@ function setup() {
     cancel.size(250, 250)
     cancel.hide()
 
+    restart = createImg("reset.gif")
+    restart.position(width/2-100, height - 200)
+    restart.size(240, 240)
+    restart.hide()
+
+    stop = createImg("stopgame3.gif")
+    stop.position(width-200,-30)
+    stop.size(250, 250)
+    stop.hide()
+
+
 
     //create ground objects from ground class using matter.js
     ground = new Ground(width / 2, height - 50, width, 20);
@@ -94,17 +108,13 @@ function setup() {
     aboutpop.addImage(aboutImg)
     aboutpop.scale = 5
 
-    score = createSprite(width / 2, 70)
+    score = createSprite(100, 70)
     score.addImage(scoreimg)
     score.visible = false
     score.scale = .4
 
 
-    lives = createSprite(width - 100, 70)
-    lives.addImage(livesimg)
-    lives.visible = false
-    lives.scale = .4
-
+    
     player = createSprite(ball.position.x - 40, height - (ball.position.y + 10))
     player.addImage(playerimg)
     player.visible = false
@@ -118,6 +128,12 @@ function setup() {
 
     gotit = createSprite(width / 2 - 10, height / 2)
     gotit.visible = false
+
+    gameover = createSprite(width /4 , height / 2)
+    gameover.addImage(gameoverimg)
+   gameover.visible = false
+    gameover.scale=1.5
+
 
     //create groups
     hoopsgroup = new Group()
@@ -159,6 +175,7 @@ function draw() {
         back.show()
         cancel.hide()
         how.hide()
+        stop.show()
 
         imageMode(CENTER)
 
@@ -166,7 +183,7 @@ function draw() {
         spawnHoops()
         //ground.show()
         score.visible = true
-        // lives.visible=true
+        //stopgame.visible=true
         player.visible = true
         player.x = ball.position.x - 70
         ballshadow.x = ball.position.x
@@ -201,7 +218,7 @@ function draw() {
                 }
 
             }
-            else (gotit.visible = false)
+            else {gotit.visible = false}
         }
 
 
@@ -228,6 +245,38 @@ function draw() {
         wallright.show()
         walltop.show()*/
     }
+
+
+//stop game button functionality
+stop.mousePressed(() => {
+    gamestate = "end"
+    //aboutpop.visible = true
+    //cancel.show()
+   
+
+})
+
+if (gamestate === "end") {
+    background(endbg)
+    play.hide()
+    about.hide()
+    cancel.hide()
+    how.hide()
+    stop.hide()
+    back.hide()
+    gameplaysound.stop()
+    hitsound.stop()
+    gameover.visible = true
+    restart.show()
+
+    fill("lime")
+    textSize(100)
+    stroke("red")
+    strokeWeight(4)
+    text(points,gameover.x-15, gameover.y+(gameover.height/2.8))
+
+
+}
 
 
     //about button functionality
@@ -276,12 +325,24 @@ function draw() {
     if (gamestate !== "play") {
         hoopsgroup.destroyEach()
         score.visible = false
-        lives.visible = false
+      //  stopgame.visible = false
         player.visible = false
         ballshadow.visible = false
+        gotit.visible=false
+        stop.hide()
+
 
 
     }
+
+
+    //restart
+    //cancel button functionality
+    restart.mousePressed(() => {
+        gamestate = "wait"
+points=0    })
+
+  
 
     drawSprites()
 
@@ -291,8 +352,8 @@ function draw() {
         stroke("black")
         strokeWeight(2)
         textSize(30)
-        textAlign("left")
-        text("Let the Madness begin!\nIf you play basketball\nfor hours with your friends\n or if you just like to watch \nyour favorite teams dominate in the NBA...\n come participate in this challenge!!\n Help Sam practice for his big day... \nThe tryouts for the Golden State Warriors!!\n The world's best basketball team is \ncoming up soon..\n\nHELP HIM TO SHOOT\nTHE BASKET ON EVERY HOOP..", aboutpop.x + 50 - (aboutpop.width + 80), aboutpop.y - (aboutpop.height + 50))
+        textAlign("center")
+        text("Let the Madness begin!\nIf you play basketball\nfor hours with your friends\n or if you just like to watch \nyour favorite teams dominate in the NBA...\n come participate in this challenge!!\n Help Sam practice for his big day... \nThe tryouts for the Golden State Warriors!!\n The world's best basketball team is \ncoming up soon..\n\nHELP HIM TO SHOOT\nTHE BASKET ON EVERY HOOP..", aboutpop.x , aboutpop.y - (aboutpop.height + 50))
 
     }
 
@@ -300,9 +361,24 @@ function draw() {
         fill("red")
         stroke("black")
         strokeWeight(2)
+        textSize(45)
+        textAlign("center")
+        text("Instructions to PLAY",aboutpop.x, aboutpop.y - (aboutpop.height + 50))
+        fill("green")
+        text("************************",aboutpop.x, aboutpop.y - (aboutpop.height + 65))
+        text("************************",aboutpop.x, aboutpop.y - (aboutpop.height + 10))
+        fill("blue")
+        stroke("red")
+        strokeWeight(2)
+        textSize(30)
+        text("Use Arrow Keys to throw the ball...\nUP ARROW - Moves the ball up.\nLEFT ARROW - Moves the ball left.\nRIGHT ARROW - Moves the ball up.\nDOWN ARROW - Moves the ball down. ", aboutpop.x, aboutpop.y -(height/4))
+        
+        fill("cyan")
+        stroke("green")
+        strokeWeight(2)
         textSize(35)
-        textAlign("left")
-        text("Instructions to PLAY:-\nUse Arrow Keys to throw the ball...\n\nUP ARROW - Moves the ball up.\nLEFT ARROW - Moves the ball left.\nRIGHT ARROW - Moves the ball up.\nDOWN ARROW - Moves the ball down.\nIf the ball goes out of the screen..\n     Donot Panic!!\n Instead move towards the extreme\nleft of the screen and wait for the\nnew ball to spawn.", aboutpop.x - (aboutpop.width + 80), aboutpop.y - (aboutpop.height + 50))
+        text("If the ball goes out of the screen..\n     Donot Panic!!\n Instead move towards the extreme\nleft of the screen and wait for the\nnew ball to spawn.", aboutpop.x, aboutpop.y +(height/10))
+
 
     }
 
@@ -312,6 +388,13 @@ function draw() {
         stroke("blue")
         strokeWeight(2)
         text(points, (score.x + 40), score.y - 15)
+    }
+
+    if(gamestate != "end"){
+        gameover.visible = false
+        restart.hide()
+
+
     }
 
 
